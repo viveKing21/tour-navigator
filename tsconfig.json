@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "declaration": true,
+        "lib": [
+          "dom",
+          "dom.iterable",
+          "esnext"
+        ],
+        "strict": true,
+        "module": "esnext",
+        "moduleResolution": "node",
+        "jsx": "react-jsx",
+        "outDir": "./lib",
+        "allowSyntheticDefaultImports": true
+    },
+    "include": ["src"],
+    "exclude": ["node_modules", "**/__tests__/*"]
+}
