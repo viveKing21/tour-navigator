@@ -1,7 +1,7 @@
-import React, { Component, ReactNode } from 'react'
+import { PureComponent, ReactNode, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import './tourNavigator.css'
-import { Align, Position, FitPriority, TourNavigatorProps, TourNavigatorStates, ClientBoundingRect, HelperProps, Step } from './types'
+import { Align, Position, FitPriority, TourNavigatorProps, TourNavigatorStates, Step, ClientBoundingRect } from './types'
 
 const fitPriority: FitPriority = {
     left: [Position.RIGHT, Position.BOTTOM, Position.TOP],
@@ -10,7 +10,23 @@ const fitPriority: FitPriority = {
     bottom: [Position.TOP, Position.LEFT, Position.RIGHT]
 }
 
-export default class TourNavigator extends Component<TourNavigatorProps, TourNavigatorStates> {
+type TourNavigatorWrapperProps = {
+    children?: JSX.Element,
+    onAfterOpen?: (() => void) | null,
+    onBeforeClose?: (() => void) | null
+}
+function TourNavigatorWrapper({children, onAfterOpen, onBeforeClose}: TourNavigatorWrapperProps) {
+    
+    useEffect(() => {
+        onAfterOpen?.()
+        return () => {
+            onBeforeClose?.();
+        };
+    }, [])
+
+    return children || null
+}
+export default class TourNavigator extends PureComponent<TourNavigatorProps, TourNavigatorStates> {
     
     static defaultProps: Partial<TourNavigatorProps> = {
         maskRadius: 5,
@@ -25,7 +41,7 @@ export default class TourNavigator extends Component<TourNavigatorProps, TourNav
         onRequestClose: null,
         onNext: null,
         onPrev: null,
-        scrollIntoViewOptions: { block: 'nearest', inline: 'nearest'},
+        scrollIntoViewOptions: { block: 'nearest', inline: 'nearest', behavior: 'auto'},
         resizeListener: true,
         scrollListener: true,
         overlayFill: 'black',
@@ -34,9 +50,13 @@ export default class TourNavigator extends Component<TourNavigatorProps, TourNav
         overlay: null,
         className: '',
         renderHelper: true,
-        renderOverlay: true
+        renderOverlay: true,
+        renderElement: document.body,
+        scrollingElement: (document.scrollingElement || document.documentElement) as HTMLElement,
     }
 
+    private renderElement: HTMLElement = document.body;
+    private scrollingElement: HTMLElement = (document.scrollingElement || document.documentElement) as HTMLElement;
     private helper: HTMLElement | null = null;
     private resizeEventListner: (() => void) | null = null;
     private scrollEventListner: (() => void) | null = null;
@@ -49,7 +69,11 @@ export default class TourNavigator extends Component<TourNavigatorProps, TourNav
             y: 0,
             height: 0,
             width: 0,
+            isScrolling: false
         }
+
+        if(props.renderElement && props.renderElement instanceof HTMLElement) this.renderElement = props.renderElement
+        if(props.scrollingElement && props.scrollingElement instanceof HTMLElement) this.scrollingElement = props.scrollingElement
     }
     get currentStep(): Step | null {
         if (this.props.steps.length == 0) return null
@@ -62,44 +86,58 @@ export default class TourNavigator extends Component<TourNavigatorProps, TourNav
     get isCurrentElementInView(): boolean {
         if (!this.currentElement) return false
         let rect = this.currentElement.getBoundingClientRect();
+        let container = this.scrollingElement.getBoundingClientRect()
+        
         return (
-            rect.top >= 0 &&
-            rect.left >= 0 &&
-            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+            Math.ceil(rect.top) >= Math.max(0, container.top) &&
+            Math.floor(rect.bottom) <= Math.floor(Math.min(window.innerHeight, container.bottom)) &&
+            Math.ceil(rect.left) >= Math.max(0, container.left) &&
+            Math.floor(rect.right) <= Math.floor(Math.min(window.innerWidth, container.right))
         );
     }
     componentDidMount(): void {
+        if(typeof this.props.renderElement == 'string') this.renderElement = document.querySelector(this.props.renderElement) || document.body
+        if(typeof this.props.scrollingElement == 'string') this.scrollingElement = document.querySelector(this.props.scrollingElement) || (document.scrollingElement || document.documentElement) as HTMLElement
         this.updateBoundingClientRect()
         if(this.props.resizeListener) window.addEventListener('resize', this.resizeEventListner = this.updateBoundingClientRect.bind(this))
-        if(this.props.scrollListener) window.addEventListener('scroll', this.scrollEventListner = this.updateBoundingClientRect.bind(this))
-        this.props.onAfterOpen?.()
+        if(this.props.scrollListener) this.scrollingElement.addEventListener('scroll', this.scrollEventListner = this.updateBoundingClientRect.bind(this))
     }
     componentWillUnmount(): void {
         if(this.resizeEventListner) window.removeEventListener('resize', this.resizeEventListner)
-        if(this.scrollEventListner) window.removeEventListener('scroll', this.scrollEventListner)
-        this.props.onBeforeClose?.()
+        if(this.scrollEventListner) this.scrollingElement.removeEventListener('scroll', this.scrollEventListner)
+    }
+    scrollElementIntoView(callback: () => void): void {
+        if(!this.currentElement) return
+        if (this.isCurrentElementInView) {
+            callback()  
+        }else{
+            if(this.scrollEventListner) this.scrollingElement.removeEventListener('scroll', this.scrollEventListner)
+            this.currentElement.scrollIntoView(this.props.scrollIntoViewOptions)
+            const revert = () => {
+                callback()
+                this.setState({isScrolling: false})
+                if(this.props.scrollListener) this.scrollingElement.addEventListener('scroll', this.scrollEventListner = this.updateBoundingClientRect.bind(this))
+            }
+
+            if(this.props.scrollIntoViewOptions?.behavior == 'smooth'){
+                this.setState({isScrolling: true})
+                this.scrollingElement.addEventListener('scrollend', () => {
+                    revert()
+                    window.removeEventListener('scrollend', revert)
+                }, {once: true})
+                window.addEventListener('scrollend', () => {
+                    revert()
+                    this.scrollingElement.removeEventListener('scrollend', revert)
+                }, {once: true})
+            }else revert()
+        } 
     }
     updateBoundingClientRect(): void {
-        if (!this.currentElement) return
-
-        const focusOnElement = (): void => {
+        this.scrollElementIntoView(() => {
             if(this.currentElement == null) return
             const { x, y, height, width } = this.currentElement.getBoundingClientRect()
             this.setState({ x, y, height, width })
-        } 
-
-        if(this.isCurrentElementInView) {
-            focusOnElement()
-        }
-        else{
-            if(this.scrollEventListner) window.removeEventListener('scroll', this.scrollEventListner)
-            this.currentElement.scrollIntoView(this.props.scrollIntoViewOptions)
-            window.addEventListener('scrollend', () => {
-                focusOnElement()
-                if(this.props.scrollListener) window.addEventListener('scroll', this.scrollEventListner = this.updateBoundingClientRect.bind(this))
-            }, {once: true})
-        }
+        })
     }
     getMaskBoundingClientRect(): ClientBoundingRect {
         const { x, y, height, width } = this.state
@@ -131,6 +169,7 @@ export default class TourNavigator extends Component<TourNavigatorProps, TourNav
                 steps: this.props.steps,
                 next: this.next.bind(this),
                 prev: this.prev.bind(this),
+                isScrolling: this.state.isScrolling,
                 onRequestClose: this.props.onRequestClose || null
             })
         })
@@ -146,6 +185,7 @@ export default class TourNavigator extends Component<TourNavigatorProps, TourNav
                 steps: this.props.steps,
                 next: this.next.bind(this),
                 prev: this.prev.bind(this),
+                isScrolling: this.state.isScrolling,
                 onRequestClose: this.props.onRequestClose || null
             })
         })
@@ -164,10 +204,10 @@ export default class TourNavigator extends Component<TourNavigatorProps, TourNav
         return (
             <div className='__tourNavigator-overlay' ref={overlayRef}>
                 {
-                    this.props.overlay ? this.props.overlay({x, y, height, width}):(
+                    this.props.overlay ? this.props.overlay({x, y, height, width, isScrolling: this.state.isScrolling}):(
                         <svg height='100%' width='100%'>
                             <defs>
-                                <mask id={this.props.id}>
+                                <mask id={`__tourNavigator-mask-${this.props.id}`}>
                                     <rect x={0} y={0} height={'100%'} width={'100%'} fill='white' />
                                     <rect
                                         x={x}
@@ -177,7 +217,7 @@ export default class TourNavigator extends Component<TourNavigatorProps, TourNav
                                         fill='black'
                                         rx={this.props.maskRadius}
                                         opacity={this.props.maskOpacity}
-                                        style={this.props.maskStyle}
+                                        style={{...this.props.maskStyle, ...(this.state.isScrolling ? this.props.maskStyleDuringScroll:undefined)}}
                                     />
                                 </mask>
                             </defs>
@@ -188,7 +228,7 @@ export default class TourNavigator extends Component<TourNavigatorProps, TourNav
                                 width={'100%'} 
                                 fill={this.props.overlayFill} 
                                 opacity={this.props.overlayOpacity} 
-                                mask={`url(#${this.props.id})`} 
+                                mask={`url(#__tourNavigator-mask-${this.props.id})`}
                             />
                         </svg>
                     )
@@ -271,6 +311,7 @@ export default class TourNavigator extends Component<TourNavigatorProps, TourNav
                         steps: this.props.steps,
                         next: this.next.bind(this),
                         prev: this.prev.bind(this),
+                        isScrolling: this.state.isScrolling,
                         onRequestClose: this.props.onRequestClose || null
                     })
                 }
@@ -279,13 +320,14 @@ export default class TourNavigator extends Component<TourNavigatorProps, TourNav
     }
     render() {
         if (!this.props.isOpen) return null
-
         return ReactDOM.createPortal(
-            <div className={`__tourNavigator ${this.props.className}`}>
-                {this.props.renderOverlay && this.renderOverLay()}
-                {this.props.renderHelper && this.renderHelper()}
-            </div>,
-            document.body
+            <TourNavigatorWrapper onAfterOpen={this.props.onAfterOpen} onBeforeClose={this.props.onBeforeClose}>
+                <div className={`__tourNavigator ${this.props.className}`}>
+                    {this.props.renderOverlay && this.renderOverLay()}
+                    {this.props.renderHelper && this.renderHelper()}
+                </div>
+            </TourNavigatorWrapper>,
+            this.renderElement
         )
     }
 }

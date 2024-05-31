@@ -31,11 +31,16 @@ export type ClientBoundingRect = {
     width: number;
 }
 
+export type OverlayProps = ClientBoundingRect & {
+    isScrolling: boolean
+}
+
 export type HelperProps = {
     id: string;
     currentStep: Step | null;
     currentStepIndex: number;
     steps: Step[];
+    isScrolling: boolean;
     next: () => void;
     prev: () => void;
     onRequestClose: ((params: {event: MouseEvent | PointerEvent, isMask: boolean}) => void) | null
@@ -45,6 +50,9 @@ export interface TourNavigatorProps{
     id: string;
     maskRadius?: number;
     maskPadding?: number;
+    maskOpacity?: number;
+    maskStyle?: CSSProperties;
+    maskStyleDuringScroll?: CSSProperties;
     startAt?: number;
     maskHelperDistance?: number;
     screenHelperDistance?: number;
@@ -61,12 +69,12 @@ export interface TourNavigatorProps{
     scrollListener?: boolean;
     overlayFill?: string;
     overlayOpacity?: number;
-    maskOpacity?: number;
-    overlay?: ((boundingRect: ClientBoundingRect) => ReactNode) | null;
+    overlay?: ((props: OverlayProps) => ReactNode) | null;
     className?: string;
     renderOverlay?: boolean;
     renderHelper?: boolean;
-    maskStyle?: CSSProperties;
+    renderElement?: HTMLElement | string;
+    scrollingElement?: HTMLElement | string;
 }
 export interface TourNavigatorStates {
     currentStepIndex: number;
@@ -74,4 +82,5 @@ export interface TourNavigatorStates {
     y: number;
     height: number;
     width: number;
+    isScrolling: boolean;
 }
