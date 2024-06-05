@@ -1,12 +1,15 @@
 {
   "name": "tour-navigator",
-  "version": "1.0.9",
+  "version": "1.0.11",
   "description": "Streamline website tours with Tour Navigator: Customizable and intuitive.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "start": "react-scripts start",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "repository": {
     "type": "git",
@@ -24,14 +27,15 @@
     "url": "https://github.com/viveKing21/tour-navigator/issues"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "homepage": "https://github.com/viveKing21/tour-navigator#readme",
   "devDependencies": {
-    "@types/react": "^18.2.79",
-    "@types/react-dom": "^18.2.25",
-    "typescript": "^5.4.5"
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0"
   },
-  "files": ["lib/**/*"]
+  "files": [
+    "lib/**/*"
+  ]
 }
