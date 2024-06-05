@@ -41,6 +41,7 @@ export type HelperProps = {
     currentStepIndex: number;
     steps: Step[];
     isScrolling: boolean;
+    target: HTMLElement | null;
     next: () => void;
     prev: () => void;
     onRequestClose: ((params: {event: MouseEvent | PointerEvent, isMask: boolean}) => void) | null
