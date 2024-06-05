@@ -64,7 +64,9 @@ export interface TourNavigatorProps{
     onRequestClose?: ((params: {event: MouseEvent | PointerEvent, isMask: boolean}) => void) | null;
     onNext?: ((props: HelperProps) => void) | null;
     onPrev?: ((props: HelperProps) => void) | null;
-    scrollIntoViewOptions?: ScrollIntoViewOptions;
+    scrollBehavior?: 'smooth' | 'auto';
+    intersectionThreshold?: number;
+    intersectionMargin?: number;
     resizeListener?: boolean;
     scrollListener?: boolean;
     overlayFill?: string;
@@ -75,6 +77,7 @@ export interface TourNavigatorProps{
     renderHelper?: boolean;
     renderElement?: HTMLElement | string;
     scrollingElement?: HTMLElement | string;
+    rootElement?: Element | Document;
 }
 export interface TourNavigatorStates {
     currentStepIndex: number;
