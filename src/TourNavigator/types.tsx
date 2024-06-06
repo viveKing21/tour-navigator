@@ -38,6 +38,7 @@ export type OverlayProps = ClientBoundingRect & {
 export type HelperProps = {
     id: string;
     currentStep: Step | null;
+    target: HTMLElement | null;
     currentStepIndex: number;
     steps: Step[];
     isScrolling: boolean;
@@ -72,6 +73,7 @@ export interface TourNavigatorProps{
     resizeListener?: boolean;
     scrollListener?: boolean;
     mutationListener?: boolean;
+    mutationSubtreeListner?: boolean;
     overlayFill?: string;
     overlayOpacity?: number;
     overlay?: ((props: OverlayProps) => ReactNode) | null;
