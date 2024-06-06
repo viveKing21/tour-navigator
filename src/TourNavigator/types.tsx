@@ -41,9 +41,10 @@ export type HelperProps = {
     currentStepIndex: number;
     steps: Step[];
     isScrolling: boolean;
+    goto: (stepIndex: number) => void;
     next: () => void;
     prev: () => void;
-    onRequestClose: ((params: {event: MouseEvent | PointerEvent, isMask: boolean}) => void) | null
+    onRequestClose: ((params: {event: MouseEvent | PointerEvent, isMask: boolean, isOverlay: boolean}) => void) | null
 }
 
 export interface TourNavigatorProps{
@@ -61,22 +62,26 @@ export interface TourNavigatorProps{
     steps: Step[];
     helper?: ((props: HelperProps) => ReactNode) | null,
     isOpen?: boolean;
-    onRequestClose?: ((params: {event: MouseEvent | PointerEvent, isMask: boolean}) => void) | null;
+    onRequestClose?: ((params: {event: MouseEvent | PointerEvent, isMask: boolean, isOverlay: boolean}) => void) | null;
     onNext?: ((props: HelperProps) => void) | null;
     onPrev?: ((props: HelperProps) => void) | null;
+    onMove?: ((props: HelperProps) => void) | null;
     scrollBehavior?: 'smooth' | 'auto';
     intersectionThreshold?: number;
     intersectionMargin?: number;
     resizeListener?: boolean;
     scrollListener?: boolean;
+    mutationListener?: boolean;
     overlayFill?: string;
     overlayOpacity?: number;
     overlay?: ((props: OverlayProps) => ReactNode) | null;
     className?: string;
+    style?: CSSProperties;
     renderOverlay?: boolean;
     renderHelper?: boolean;
     renderElement?: HTMLElement | string;
-    scrollingElement?: HTMLElement | string;
+    scrollingElement?: HTMLElement | Document | Element | string;
+    mutationElement?: HTMLElement | string;
     rootElement?: Element | Document;
 }
 export interface TourNavigatorStates {
@@ -86,4 +91,5 @@ export interface TourNavigatorStates {
     height: number;
     width: number;
     isScrolling: boolean;
+    elementsMap: { [key: string] : HTMLElement | null };
 }
