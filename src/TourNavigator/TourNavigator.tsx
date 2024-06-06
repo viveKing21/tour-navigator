@@ -1,7 +1,7 @@
 import { PureComponent, ReactNode, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import './tourNavigator.css'
-import { Align, Position, FitPriority, TourNavigatorProps, TourNavigatorStates, Step, ClientBoundingRect } from './types'
+import { Align, Position, FitPriority, TourNavigatorProps, TourNavigatorStates, Step, ClientBoundingRect, HelperProps } from './types'
 
 const fitPriority: FitPriority = {
     left: [Position.RIGHT, Position.BOTTOM, Position.TOP],
@@ -49,6 +49,7 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
         intersectionMargin: 1,
         resizeListener: true,
         scrollListener: true,
+        mutationSubtreeListner: false,
         overlayFill: 'black',
         overlayOpacity: 0.5,
         maskOpacity: 1,
@@ -132,7 +133,7 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
                     this.updateBoundingClientRect() 
                 })
             })
-            this.mutationObserver.observe(this.mutationElement, {childList: true})
+            this.mutationObserver.observe(this.mutationElement, {childList: true, subtree: this.props.mutationSubtreeListner})
         }
     }
     componentWillUnmount(): void {
@@ -218,11 +219,12 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
         let currentStepIndex = Math.max(0, Math.min(stepIndex, this.props.steps.length - 1))
         this.setState({currentStepIndex}, () => {
             this.updateBoundingClientRect()
-            let props = {
+            let props: HelperProps = {
                 id: this.props.id,
                 currentStep: this.currentStep,
                 currentStepIndex: currentStepIndex,
                 steps: this.props.steps,
+                target: this.currentElement,
                 goto: this.goto.bind(this),
                 next: this.next.bind(this),
                 prev: this.prev.bind(this),
@@ -241,6 +243,7 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
                 currentStep: this.currentStep,
                 currentStepIndex: currentStepIndex,
                 steps: this.props.steps,
+                target: this.currentElement,
                 goto: this.goto.bind(this),
                 next: this.next.bind(this),
                 prev: this.prev.bind(this),
@@ -260,6 +263,7 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
                 currentStep: this.currentStep,
                 currentStepIndex: currentStepIndex,
                 steps: this.props.steps,
+                target: this.currentElement,
                 goto: this.goto.bind(this),
                 next: this.next.bind(this),
                 prev: this.prev.bind(this),
@@ -376,7 +380,8 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
             x = Math.max(screenHelperDistance, Math.min(window.innerWidth - boundingRect.width - screenHelperDistance, x))
             y = Math.max(screenHelperDistance, Math.min(window.innerHeight - boundingRect.height - screenHelperDistance, y))
 
-            this.helper.dataset.position = position
+            this.helper.dataset.position = position.toLowerCase()
+            this.helper.dataset.align = align.toString().toLowerCase()
             this.helper.style.setProperty('--x', String(x))
             this.helper.style.setProperty('--y', String(y))
         }
@@ -389,6 +394,7 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
                         currentStep: this.currentStep,
                         currentStepIndex: currentStepIndex,
                         steps: this.props.steps,
+                        target: this.currentElement,
                         goto: this.goto.bind(this),
                         next: this.next.bind(this),
                         prev: this.prev.bind(this),
