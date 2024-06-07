@@ -28,7 +28,6 @@ function TourNavigatorWrapper({children, onAfterOpen, onBeforeClose}: TourNaviga
 }
 
 export default class TourNavigator extends PureComponent<TourNavigatorProps, TourNavigatorStates> {
-    
     static defaultProps: Partial<TourNavigatorProps> = {
         steps: [],
         maskRadius: 5,
@@ -55,8 +54,7 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
         renderOverlay: true,
         renderElement: document.body,
         scrollingElement: document,
-        rootElement: document,
-        waitForElement: false
+        waitForElementRendered: false
     }
 
     private renderElement: HTMLElement = document.body;
@@ -71,11 +69,12 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
         super(props)
         this.state = {
             currentStepIndex: props.startAt ?? 0,
+            previousStepIndex: -1,
             x: 0,
             y: 0,
             height: 0,
             width: 0,
-            isScrolling: false,
+            isScrollingIntoView: false,
             elementsMap: {}
         }
 
@@ -85,7 +84,7 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
     }
     get currentStepIndex(): number {
         let {elementsMap, currentStepIndex} = this.state
-        let waitForElement = elementsMap[this.props.steps?.[currentStepIndex]?.selector || ''] || this.props.waitForElement == false
+        let waitForElement = elementsMap[this.props.steps?.[currentStepIndex]?.selector || ''] || this.props.waitForElementRendered == false
         if(waitForElement) return this.lastAvailableStepIndex = currentStepIndex
         return this.lastAvailableStepIndex
     }
@@ -99,7 +98,7 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
     }
     get isCurrentElementInView(): boolean {
         if (!this.currentElement) return false
-        if(this.currentStep?.scrollInView === false) return true
+        if(this.currentStep?.scrollIntoView === false) return true
 
         let rect = this.currentElement.getBoundingClientRect();
         
@@ -148,8 +147,10 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
                 });
             });
 
-            const addToObserveList = (target: string | HTMLElement, config: MutationObserverInit = { childList: true }) => {
+            const addToObserveList = (target: string | HTMLElement, config?: MutationObserverInit) => {
                 let targetElement: HTMLElement | null = null;
+
+                config = { childList: true, ...config }
 
                 if (typeof target === 'string') {
                     targetElement = document.querySelector(target);
@@ -199,10 +200,10 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
         if(this.isCurrentElementInView){
             updateFocus()
         }else{
-            this.setState({isScrolling: true})
+            this.setState({isScrollingIntoView: true})
             if(this.scrollEventListner) this.scrollingElement.removeEventListener('scroll', this.scrollEventListner)
             this.scrollIntoView(() => {
-                this.setState({isScrolling: false})
+                this.setState({isScrollingIntoView: false})
                 if(this.scrollEventListner) this.scrollingElement.addEventListener('scroll', this.scrollEventListner)
                 updateFocus()
             }, scrollIntoViewOptions)
@@ -222,13 +223,15 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
         }
 
         let intersectionOption: IntersectionObserverInit = {
-            threshold: Math.max(0, Math.min(Number(this.currentStep?.intersectionThreshold || 1), 1)),
-            rootMargin: `${this.currentStep?.intersectionMargin || 1}px`,
-            root: this.props.rootElement 
+            threshold: this.currentStep?.intersectionOption?.threshold || 1,
+            rootMargin: `${this.currentStep?.intersectionOption?.threshold || 1}px`
         }
 
-        console.log(intersectionOption)
-        const observer = new IntersectionObserver(observerCallback, intersectionOption)
+        if(typeof this.currentStep?.intersectionOption?.root === 'string'){
+            intersectionOption.root = document.querySelector(this.currentStep?.intersectionOption?.root)
+        }
+
+        const observer = new IntersectionObserver(observerCallback, intersectionOption as IntersectionObserverInit)
         observer.observe(this.currentElement)
 
         this.currentElement.scrollIntoView({
@@ -259,18 +262,19 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
     goto(stepIndex: number): void{
         let currentStepIndex = Math.max(0, Math.min(stepIndex, this.props.steps.length - 1))
         
-        this.setState({currentStepIndex}, () => {
+        this.setState({currentStepIndex, previousStepIndex: this.state.currentStepIndex}, () => {
             this.updateBoundingClientRect()
             let props: HelperProps = {
                 id: this.props.id,
                 currentStep: this.currentStep,
                 currentStepIndex: this.currentStepIndex,
+                previousStepIndex: this.state.previousStepIndex,
                 steps: this.props.steps,
                 target: this.currentElement,
                 goto: this.goto.bind(this),
                 next: this.next.bind(this),
                 prev: this.prev.bind(this),
-                isScrolling: this.state.isScrolling,
+                isScrollingIntoView: this.state.isScrollingIntoView,
                 onRequestClose: this.props.onRequestClose || null
             }
             this.props.onMove && this.props.onMove(props)
@@ -278,18 +282,19 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
     }
     next(): void {
         let currentStepIndex = Math.min(this.state.currentStepIndex + 1, this.props.steps.length - 1)
-        this.setState({currentStepIndex}, () => {
+        this.setState({currentStepIndex, previousStepIndex: this.state.currentStepIndex}, () => {
             this.updateBoundingClientRect()
             const props = {
                 id: this.props.id,
                 currentStep: this.currentStep,
                 currentStepIndex: this.currentStepIndex,
+                previousStepIndex: this.state.previousStepIndex,
                 steps: this.props.steps,
                 target: this.currentElement,
                 goto: this.goto.bind(this),
                 next: this.next.bind(this),
                 prev: this.prev.bind(this),
-                isScrolling: this.state.isScrolling,
+                isScrollingIntoView: this.state.isScrollingIntoView,
                 onRequestClose: this.props.onRequestClose || null
             }
             this.props.onNext && this.props.onNext(props)
@@ -298,18 +303,19 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
     }
     prev(): void {
         let currentStepIndex = Math.max(this.state.currentStepIndex - 1, 0)
-        this.setState({currentStepIndex}, () => {
+        this.setState({currentStepIndex, previousStepIndex: this.state.currentStepIndex}, () => {
             this.updateBoundingClientRect()
             const props = {
                 id: this.props.id,
                 currentStep: this.currentStep,
                 currentStepIndex: this.currentStepIndex,
+                previousStepIndex: this.state.previousStepIndex,
                 steps: this.props.steps,
                 target: this.currentElement,
                 goto: this.goto.bind(this),
                 next: this.next.bind(this),
                 prev: this.prev.bind(this),
-                isScrolling: this.state.isScrolling,
+                isScrollingIntoView: this.state.isScrollingIntoView,
                 onRequestClose: this.props.onRequestClose || null
             }
             this.props.onPrev && this.props.onPrev(props)
@@ -330,7 +336,7 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
         return (
             <div className='__tourNavigator-overlay' ref={overlayRef}>
                 {
-                    this.props.overlay ? this.props.overlay({x, y, height, width, isScrolling: this.state.isScrolling}):(
+                    this.props.overlay ? this.props.overlay({x, y, height, width, isScrollingIntoView: this.state.isScrollingIntoView}):(
                         <svg height='100%' width='100%'>
                             <defs>
                                 <mask id={`__tourNavigator-mask-${this.props.id}`}>
@@ -343,7 +349,7 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
                                         fill='black'
                                         rx={this.props.maskRadius}
                                         opacity={this.props.maskOpacity}
-                                        style={{...this.props.maskStyle, ...(this.state.isScrolling ? this.props.maskStyleDuringScroll:undefined)}}
+                                        style={{...this.props.maskStyle, ...(this.state.isScrollingIntoView ? this.props.maskStyleDuringScroll:undefined)}}
                                     />
                                 </mask>
                             </defs>
@@ -435,12 +441,13 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
                         id: this.props.id,
                         currentStep: this.currentStep,
                         currentStepIndex: currentStepIndex,
+                        previousStepIndex: this.state.previousStepIndex,
                         steps: this.props.steps,
                         target: this.currentElement,
                         goto: this.goto.bind(this),
                         next: this.next.bind(this),
                         prev: this.prev.bind(this),
-                        isScrolling: this.state.isScrolling,
+                        isScrollingIntoView: this.state.isScrollingIntoView,
                         onRequestClose: this.props.onRequestClose || null
                     })
                 }

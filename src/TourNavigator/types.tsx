@@ -22,10 +22,14 @@ export type Step = {
     data?: any;
     align?: Align;
     position?: Position | [Position, Position, Position, Position];
-    scrollInView?: boolean;
-    intersectionThreshold?: number,
-    intersectionMargin?: number;
+    scrollIntoView?: boolean;
+    intersectionOption?: {
+        root?: Element | Document | string | null;
+        rootMargin?: string;
+        threshold?: number | number[];
+    }
 }
+
 
 export type ClientBoundingRect = {
     x: number;
@@ -35,7 +39,7 @@ export type ClientBoundingRect = {
 }
 
 export type OverlayProps = ClientBoundingRect & {
-    isScrolling: boolean
+    isScrollingIntoView: boolean
 }
 
 export type HelperProps = {
@@ -43,8 +47,9 @@ export type HelperProps = {
     currentStep: Step | null;
     target: HTMLElement | null;
     currentStepIndex: number;
+    previousStepIndex: number;
     steps: Step[];
-    isScrolling: boolean;
+    isScrollingIntoView: boolean;
     goto: (stepIndex: number) => void;
     next: () => void;
     prev: () => void;
@@ -89,15 +94,15 @@ export interface TourNavigatorProps{
     renderHelper?: boolean;
     renderElement?: HTMLElement | string;
     scrollingElement?: HTMLElement | Document | Element | string;
-    rootElement?: Element | Document;
-    waitForElement?: boolean;
+    waitForElementRendered?: boolean;
 }
 export interface TourNavigatorStates {
     currentStepIndex: number;
+    previousStepIndex: number;
     x: number;
     y: number;
     height: number;
     width: number;
-    isScrolling: boolean;
+    isScrollingIntoView: boolean;
     elementsMap: { [key: string] : HTMLElement | null };
 }
