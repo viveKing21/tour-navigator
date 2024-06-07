@@ -97,12 +97,7 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
     }
     get currentElement(): HTMLElement | null {
         if(this.currentStep == null) return null
-
-        if(this.currentStep?.selector in this.state.elementsMap){
-            return this.state.elementsMap[this.currentStep.selector]
-        }
-
-        return document.querySelector(this.currentStep.selector)
+        return this.state.elementsMap[this.currentStep.selector] || document.querySelector(this.currentStep.selector)
     }
     get isCurrentElementInView(): boolean {
         if (!this.currentElement) return false
