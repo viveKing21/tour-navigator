@@ -47,7 +47,13 @@ export type HelperProps = {
     prev: () => void;
     onRequestClose: ((params: {event: MouseEvent | PointerEvent, isMask: boolean, isOverlay: boolean}) => void) | null
 }
-
+type MutationObserverConfig = 
+    | string
+    | string[]
+    | HTMLElement
+    | HTMLElement[]
+    | [string | HTMLElement, MutationObserverInit?]
+    | [string | HTMLElement, MutationObserverInit?][];
 export interface TourNavigatorProps{
     id: string;
     maskRadius?: number;
@@ -72,8 +78,7 @@ export interface TourNavigatorProps{
     intersectionMargin?: number;
     resizeListener?: boolean;
     scrollListener?: boolean;
-    mutationListener?: boolean;
-    mutationSubtreeListner?: boolean;
+    mutationObserve?: MutationObserverConfig
     overlayFill?: string;
     overlayOpacity?: number;
     overlay?: ((props: OverlayProps) => ReactNode) | null;
@@ -83,8 +88,8 @@ export interface TourNavigatorProps{
     renderHelper?: boolean;
     renderElement?: HTMLElement | string;
     scrollingElement?: HTMLElement | Document | Element | string;
-    mutationElement?: HTMLElement | string;
     rootElement?: Element | Document;
+    waitForElement?: boolean;
 }
 export interface TourNavigatorStates {
     currentStepIndex: number;
