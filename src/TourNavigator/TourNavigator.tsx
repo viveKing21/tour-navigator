@@ -44,8 +44,6 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
         onNext: null,
         onPrev: null,
         scrollBehavior: 'smooth',
-        intersectionThreshold: 1,
-        intersectionMargin: 1,
         resizeListener: true,
         scrollListener: true,
         overlayFill: 'black',
@@ -101,6 +99,8 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
     }
     get isCurrentElementInView(): boolean {
         if (!this.currentElement) return false
+        if(this.currentStep?.scrollInView === false) return true
+
         let rect = this.currentElement.getBoundingClientRect();
         
         let container;
@@ -191,10 +191,10 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
     updateBoundingClientRect(scrollIntoViewOptions?: ScrollIntoViewOptions): void {
         const updateFocus = () => {
             if(this.currentElement == null) return
-
             const { x, y, height, width } = this.currentElement.getBoundingClientRect()
             this.setState({ x, y, height, width })
         }
+
 
         if(this.isCurrentElementInView){
             updateFocus()
@@ -222,11 +222,12 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
         }
 
         let intersectionOption: IntersectionObserverInit = {
-            threshold: Math.max(0, Math.min(Number(this.props.intersectionMargin), 1)),
-            rootMargin: `${this.props.intersectionMargin}px`,
+            threshold: Math.max(0, Math.min(Number(this.currentStep?.intersectionThreshold || 1), 1)),
+            rootMargin: `${this.currentStep?.intersectionMargin || 1}px`,
             root: this.props.rootElement 
         }
 
+        console.log(intersectionOption)
         const observer = new IntersectionObserver(observerCallback, intersectionOption)
         observer.observe(this.currentElement)
 

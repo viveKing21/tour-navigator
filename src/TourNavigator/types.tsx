@@ -19,9 +19,12 @@ export type FitPriority = {
 
 export type Step = {
     selector: string;
-    align?: Align,
+    data?: any;
+    align?: Align;
     position?: Position | [Position, Position, Position, Position];
-    data: any
+    scrollInView?: boolean;
+    intersectionThreshold?: number,
+    intersectionMargin?: number;
 }
 
 export type ClientBoundingRect = {
@@ -74,8 +77,6 @@ export interface TourNavigatorProps{
     onPrev?: ((props: HelperProps) => void) | null;
     onMove?: ((props: HelperProps) => void) | null;
     scrollBehavior?: 'smooth' | 'auto';
-    intersectionThreshold?: number;
-    intersectionMargin?: number;
     resizeListener?: boolean;
     scrollListener?: boolean;
     mutationObserve?: MutationObserverConfig
