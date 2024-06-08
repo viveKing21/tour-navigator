@@ -26,7 +26,7 @@ export type Step = {
     intersectionOption?: {
         root?: Element | Document | string | null;
         rootMargin?: string;
-        threshold?: number | number[];
+        threshold?: number;
     }
 }
 
