@@ -17,11 +17,14 @@ export type FitPriority = {
     [key in Position]: [Position, Position, Position];
 };
 
+export type RecursiveFunction = () => RecursiveFunction;
+
 export type Step = {
     selector: string;
     data?: any;
     align?: Align;
     position?: Position | [Position, Position, Position, Position];
+    container?: HTMLElement | Element | string
     scrollIntoView?: boolean;
     intersectionOption?: {
         root?: Element | Document | string | null;
@@ -43,13 +46,14 @@ export type OverlayProps = ClientBoundingRect & {
 }
 
 export type HelperProps = {
-    id: string;
+    id?: string;
     currentStep: Step | null;
     target: HTMLElement | null;
     currentStepIndex: number;
     previousStepIndex: number;
     steps: Step[];
     isScrollingIntoView: boolean;
+    focus: (scrollBehavior?: 'auto' | 'smooth') => void;
     goto: (stepIndex: number) => void;
     next: () => void;
     prev: () => void;
@@ -62,8 +66,9 @@ type MutationObserverConfig =
     | HTMLElement[]
     | [string | HTMLElement, MutationObserverInit?]
     | [string | HTMLElement, MutationObserverInit?][];
+
 export interface TourNavigatorProps{
-    id: string;
+    id?: string;
     maskRadius?: number;
     maskPadding?: number;
     maskOpacity?: number;

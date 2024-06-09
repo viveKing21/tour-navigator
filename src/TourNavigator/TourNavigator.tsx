@@ -1,7 +1,7 @@
 import { PureComponent, ReactNode, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import './tourNavigator.css'
-import { Align, Position, FitPriority, TourNavigatorProps, TourNavigatorStates, Step, ClientBoundingRect, HelperProps } from './types'
+import { Align, Position, FitPriority, TourNavigatorProps, TourNavigatorStates, Step, ClientBoundingRect, HelperProps, RecursiveFunction } from './types'
 
 const fitPriority: FitPriority = {
     left: [Position.RIGHT, Position.BOTTOM, Position.TOP],
@@ -10,25 +10,27 @@ const fitPriority: FitPriority = {
     bottom: [Position.TOP, Position.LEFT, Position.RIGHT]
 }
 
-type TourNavigatorWrapperProps = {
-    children?: JSX.Element,
-    onAfterOpen?: (() => void) | null,
+interface TourNavigatorWrapperProps {
+    children: JSX.Element
+    onAfterOpen?: (() => void) | null
     onBeforeClose?: (() => void) | null
 }
-function TourNavigatorWrapper({children, onAfterOpen, onBeforeClose}: TourNavigatorWrapperProps) {
+function TourNavigatorWrapper({children, onAfterOpen, onBeforeClose}: TourNavigatorWrapperProps){
     
     useEffect(() => {
         onAfterOpen?.()
         return () => {
-            onBeforeClose?.();
-        };
+            onBeforeClose?.()
+        }
     }, [])
 
-    return children || null
+    return children
 }
 
-export default class TourNavigator extends PureComponent<TourNavigatorProps, TourNavigatorStates> {
+
+class TourNavigator extends PureComponent<TourNavigatorProps, TourNavigatorStates> {
     static defaultProps: Partial<TourNavigatorProps> = {
+        id: `___tournavigator-${Date.now()}`,
         steps: [],
         maskRadius: 5,
         maskPadding: 5,
@@ -62,7 +64,7 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
     private helper: HTMLElement | null = null;
     private mutationObserver?: MutationObserver;
     private lastAvailableStepIndex: number = 0;
-    private subscribe: Map<Element | Document | Window, () => void> = new Map;
+    private subscribe: Map<Element | Document | Window, () => RecursiveFunction> = new Map;
 
     constructor(props: TourNavigatorProps) {
         super(props)
@@ -95,6 +97,13 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
         if(this.currentStep == null) return null
         return this.state.elementsMap[this.currentStep.selector] || document.querySelector(this.currentStep.selector)
     }
+    get currentScrollingContainer(): HTMLElement  {
+        let selector = this.currentStep?.container
+        if(typeof selector === 'string'){
+            return this.state.elementsMap[selector] || document.querySelector(selector) || document.body
+        }
+        return (this.currentStep?.container || document.body) as HTMLElement
+    }
     componentDidMount(): void {
         if(typeof this.props.renderElement == 'string') this.renderElement = document.querySelector(this.props.renderElement) || document.body
         if(typeof this.props.scrollingElement == 'string') this.scrollingElement = (document.querySelector(this.props.scrollingElement) || (document.scrollingElement || document.documentElement)) as HTMLElement
@@ -118,27 +127,27 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
             if(element_) element = element_
             else return
         }
+        
+        let target = element as Element | Document | Window
 
-        if(this.subscribe.has(element)) {
-            let unsubscribe = this.subscribe.get(element)
+        if(this.subscribe.has(target)) {
+            let unsubscribe = this.subscribe.get(target)
             unsubscribe?.()
         }
 
-        element.addEventListener(...args)
-        let unsubscribe = () =>  (element as Element | Document | Window).removeEventListener(...args)
-        this.subscribe.set(element, unsubscribe)
-    }
-    removeListener(element: Element | Document | Window | string){
-        if(typeof element === 'string'){
-            let element_ = document.querySelector(element)
-            if(element_) element = element_
-            else return
+        let subscribe = () => {
+            target.addEventListener(...args)
+            this.subscribe.set(target, unsubscribe)
+            return unsubscribe
+        }
+        
+        let unsubscribe = () => {
+            target.removeEventListener(...args)
+            this.subscribe.delete(target)
+            return subscribe
         }
 
-        if(this.subscribe.has(element)) {
-            let unsubscribe = this.subscribe.get(element)
-            unsubscribe?.()
-        }
+        subscribe()
     }
     initMutationObserver() {
         if (this.props.mutationObserve) {
@@ -186,6 +195,7 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
         this.setState({
             elementsMap: this.props.steps.reduce<{[key: string]: HTMLElement | null}>((acc, cur) => {
                 acc[cur.selector] = document.querySelector(cur.selector)
+                if(typeof cur.container === 'string') acc[cur.container] = document.querySelector(cur.container)
                 return acc
             }, {})
         }, callback)
@@ -193,33 +203,90 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
     updateBoundingClientRect(scrollIntoViewOptions?: ScrollIntoViewOptions): void {
         if(this.currentElement == null) return
 
-        const observerCallback: IntersectionObserverCallback = (entries, observer) => {
-            if(entries[0].isIntersecting == false || this.currentElement == null) return
+        let subscriptions: RecursiveFunction[] = []
 
+        if(this.props.scrollListener && this.subscribe.has(this.scrollingElement)) {
+            let unsubscribe = this.subscribe.get(this.scrollingElement)
+            unsubscribe && subscriptions.push(unsubscribe)
+        }
+
+        const updateFocus = () => {
+            if(this.currentElement == null) return
             const { x, y, height, width } = this.currentElement.getBoundingClientRect()
-            this.setState({ x, y, height, width })
-
-            observer.disconnect()
+            this.setState({ x, y, height, width, isScrollingIntoView: false })
         }
 
-        let intersectionOption: IntersectionObserverInit = {
-            threshold: this.currentStep?.intersectionOption?.threshold || 1,
-            rootMargin: this.currentStep?.intersectionOption?.rootMargin
+        if(this.currentStep?.scrollIntoView === false) return updateFocus()
+
+        const observerCallback: IntersectionObserverCallback = (entries, observer) => {
+            if(entries[0].isIntersecting) {
+                this.stopCurrentScrollIntoView()
+                updateFocus()
+                subscriptions.forEach(subscribe => subscribe())
+                observer.disconnect()
+            }
         }
 
-        if(typeof this.currentStep?.intersectionOption?.root === 'string'){
-            intersectionOption.root = document.querySelector(this.currentStep?.intersectionOption?.root)
-        }
-
-
-        const observer = new IntersectionObserver(observerCallback, intersectionOption)
+        const observer = new IntersectionObserver(observerCallback, this.getDynamicIntersectionOption())
         observer.observe(this.currentElement)
+        
+        subscriptions.forEach((unsubscribe, index) => {
+            let subscribe = unsubscribe()
+            subscriptions[index] = subscribe
+        })
+
+        this.setState({isScrollingIntoView: true})
 
         this.currentElement.scrollIntoView({
             behavior: scrollIntoViewOptions?.behavior || this.props.scrollBehavior,
             block: 'nearest',
             inline: 'nearest'
         })
+    }
+    stopCurrentScrollIntoView(){
+        let currentElement: Element | undefined | null = this.currentElement?.parentElement
+
+        while(currentElement){
+            let hasScrolling = currentElement.scrollHeight > currentElement.clientHeight || currentElement.scrollWidth > currentElement.clientWidth
+            if(hasScrolling){
+                currentElement.scrollTo({
+                    top: currentElement.scrollTop,
+                    left: currentElement.scrollLeft
+                })
+            }
+            currentElement = currentElement.parentElement
+        }
+    }
+    getDynamicIntersectionOption(): IntersectionObserverInit | undefined{
+        if(this.currentElement == null) return
+
+        const computedStyle = window.getComputedStyle(this.currentElement);
+        const borderTopWidth = parseInt(computedStyle.borderTopWidth, 10) || 1;
+        const borderRightWidth = parseInt(computedStyle.borderRightWidth, 10) || 1;
+        const borderBottomWidth = parseInt(computedStyle.borderBottomWidth, 10) || 1;
+        const borderLeftWidth = parseInt(computedStyle.borderLeftWidth, 10) || 1;
+
+        const contentHeight = this.currentElement.offsetHeight - borderTopWidth - borderBottomWidth;
+        const contentWidth = this.currentElement.offsetWidth - borderLeftWidth - borderRightWidth;
+
+        const containerHeight = Math.min(this.currentScrollingContainer.offsetHeight, window.innerHeight) - borderTopWidth - borderBottomWidth;
+        const containerWidth = Math.min(this.currentScrollingContainer.offsetWidth, window.innerWidth) - borderLeftWidth - borderRightWidth;
+
+        let adjustedThresholdY = containerHeight > contentHeight ? contentHeight / this.currentElement.offsetHeight: containerHeight / this.currentElement.offsetHeight;
+        let adjustedThresholdX = containerWidth > contentWidth ? contentWidth / this.currentElement.offsetWidth : containerWidth / contentWidth;
+
+        let adjustedThreshold = Math.min(adjustedThresholdY, adjustedThresholdX);
+
+        let intersectionOption: IntersectionObserverInit = {
+            threshold: this.currentStep?.intersectionOption?.threshold ?? adjustedThreshold,
+            rootMargin: this.currentStep?.intersectionOption?.rootMargin ?? `-${borderTopWidth}px -${borderRightWidth}px -${borderBottomWidth}px -${borderLeftWidth}px`,
+        }
+
+        if(typeof this.currentStep?.intersectionOption?.root === 'string'){
+            intersectionOption.root = document.querySelector(this.currentStep?.intersectionOption?.root)
+        }
+
+        return intersectionOption
     }
     getMaskBoundingClientRect(): ClientBoundingRect {
         const { x, y, height, width } = this.state
@@ -240,6 +307,9 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
             width: rect.width
         }
     }
+    focus(scrollBehavior: 'smooth' | 'auto' = 'auto'){
+        this.updateBoundingClientRect(scrollBehavior && {behavior: scrollBehavior})
+    }
     goto(stepIndex: number): void{
         let currentStepIndex = Math.max(0, Math.min(stepIndex, this.props.steps.length - 1))
         
@@ -252,6 +322,7 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
                 previousStepIndex: this.state.previousStepIndex,
                 steps: this.props.steps,
                 target: this.currentElement,
+                focus: this.focus.bind(this),
                 goto: this.goto.bind(this),
                 next: this.next.bind(this),
                 prev: this.prev.bind(this),
@@ -265,13 +336,14 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
         let currentStepIndex = Math.min(this.state.currentStepIndex + 1, this.props.steps.length - 1)
         this.setState({currentStepIndex, previousStepIndex: this.state.currentStepIndex}, () => {
             this.updateBoundingClientRect()
-            const props = {
+            const props: HelperProps = {
                 id: this.props.id,
                 currentStep: this.currentStep,
                 currentStepIndex: this.currentStepIndex,
                 previousStepIndex: this.state.previousStepIndex,
                 steps: this.props.steps,
                 target: this.currentElement,
+                focus: this.focus.bind(this),
                 goto: this.goto.bind(this),
                 next: this.next.bind(this),
                 prev: this.prev.bind(this),
@@ -286,13 +358,14 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
         let currentStepIndex = Math.max(this.state.currentStepIndex - 1, 0)
         this.setState({currentStepIndex, previousStepIndex: this.state.currentStepIndex}, () => {
             this.updateBoundingClientRect()
-            const props = {
+            const props: HelperProps = {
                 id: this.props.id,
                 currentStep: this.currentStep,
                 currentStepIndex: this.currentStepIndex,
                 previousStepIndex: this.state.previousStepIndex,
                 steps: this.props.steps,
                 target: this.currentElement,
+                focus: this.focus.bind(this),
                 goto: this.goto.bind(this),
                 next: this.next.bind(this),
                 prev: this.prev.bind(this),
@@ -425,6 +498,7 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
                         previousStepIndex: this.state.previousStepIndex,
                         steps: this.props.steps,
                         target: this.currentElement,
+                        focus: this.focus.bind(this),
                         goto: this.goto.bind(this),
                         next: this.next.bind(this),
                         prev: this.prev.bind(this),
@@ -448,3 +522,5 @@ export default class TourNavigator extends PureComponent<TourNavigatorProps, Tou
         )
     }
 }
+
+export default TourNavigator
