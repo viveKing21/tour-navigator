@@ -97,7 +97,18 @@ class TourNavigator extends PureComponent<TourNavigatorProps, TourNavigatorState
         if(this.currentStep == null) return null
         return this.state.elementsMap[this.currentStep.selector] || document.querySelector(this.currentStep.selector)
     }
+
     componentDidMount(): void {
+        this.mount()
+    }
+    componentWillUnmount(): void {
+        this.unmount()
+    }
+    componentDidUpdate(prevProps: Readonly<TourNavigatorProps>, prevState: Readonly<TourNavigatorStates>, snapshot?: any): void {
+        if(prevProps.isOpen && this.props.isOpen === false) this.unmount()
+        if(prevProps.isOpen == false && this.props.isOpen) this.mount()
+    }
+    mount(){
         if(typeof this.props.renderElement == 'string') this.renderElement = document.querySelector(this.props.renderElement) || document.body
         if(typeof this.props.scrollingElement == 'string') this.scrollingElement = (document.querySelector(this.props.scrollingElement) || (document.scrollingElement || document.documentElement)) as HTMLElement
         
@@ -110,7 +121,7 @@ class TourNavigator extends PureComponent<TourNavigatorProps, TourNavigatorState
 
         this.initMutationObserver()
     }
-    componentWillUnmount(): void {
+    unmount(){
         this.subscribe.forEach((unsubscribe) => unsubscribe())
         if(this.mutationObserver) this.mutationObserver.disconnect()
     }
