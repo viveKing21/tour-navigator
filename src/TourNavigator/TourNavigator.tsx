@@ -182,16 +182,15 @@ class TourNavigator extends PureComponent<TourNavigatorProps, TourNavigatorState
             if (typeof config === 'string' || config instanceof HTMLElement) {
                 addToObserveList(config);
             } else if (Array.isArray(config)) {
-                if (typeof config[0] === 'string' || config[0] instanceof HTMLElement) {
-                    config.forEach(item => {
-                        addToObserveList(item as string | HTMLElement);
-                    });
-                } else {
-                    config.forEach(item => {
-                        const [target, options] = item as [string | HTMLElement, MutationObserverInit];
+                config.forEach(item => {
+                    if (typeof item === 'string' || item instanceof HTMLElement) {
+                        addToObserveList(item);
+                    }
+                    else if(Array.isArray(item)){
+                        const [target, options] = item as [string | HTMLElement, MutationObserverInit?];
                         addToObserveList(target, options);
-                    });
-                }
+                    }
+                });
             }
         }
     }
