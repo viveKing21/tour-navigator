@@ -278,7 +278,7 @@ class TourNavigator extends PureComponent<TourNavigatorProps, TourNavigatorState
         }
 
         const intersectionOption: IntersectionObserverInit = {
-            threshold,
+            threshold: Math.floor(threshold),
             rootMargin: `${borderTopWidth}px ${borderRightWidth}px ${borderBottomWidth}px ${borderLeftWidth}px`,
         };
 
