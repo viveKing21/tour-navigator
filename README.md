@@ -2,219 +2,238 @@
   <img src="./assets/tour-navigator-hero.svg" alt="tour-navigator" width="100%"/>
 </div>
 
-# Tour Navigator
+<br/>
 
-Tour Navigator is a React package designed to facilitate the creation of customizable tours for React websites.
+<div align="center">
 
-## Installation
+[![npm version](https://img.shields.io/npm/v/tour-navigator?style=for-the-badge&color=f7971e)](https://www.npmjs.com/package/tour-navigator)
+[![npm downloads](https://img.shields.io/npm/dt/tour-navigator?style=for-the-badge&color=ffd200)](https://www.npmjs.com/package/tour-navigator)
+[![License: MIT](https://img.shields.io/badge/License-MIT-a78bfa?style=for-the-badge)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-To install Tour Navigator, you can use npm or yarn:
+**Customizable guided product tours for React.**  
+Highlight overlays · Custom tooltips · Scroll-aware · Mutation observer support · Zero layout dependencies.
 
-```bash
-npm install tour-navigator 
-# or 
-yarn add tour-navigator
-```
+</div>
 
-## Usage
+---
 
-```javascript
-import TourNavigator from 'tour-navigator';
-import { Align, Position } from "tour-navigator/lib/TourNavigator/types";
+## About
 
-// Define your steps
-const steps = [
-  {
-    selector: '.step1',
-    data: { /* Step data */ },
-    position: Position.LEFT,
-    align: Align.START
-  },
-  {
-    selector: '.step2',
-    data: { /* Step data */ },
-    position: Position.BOTTOM,
-    align: Align.CENTER
-  },
-  // Add more steps as needed
-];
+Tour Navigator is a React component for building step-by-step UI walkthroughs. It renders a spotlight mask over target elements, positions a helper tooltip beside them, and handles scrolling, resizing, and DOM changes automatically. Every visual aspect — the overlay, mask, and helper — is fully customizable through render props.
 
-// Set up Tour Navigator with your steps
-<TourNavigator
-  id="my-tour"
-  steps={steps}
-/>
-```
-## Demo
-Check out the live demo [here](https://leafy-malasada-f02c9a.netlify.app/).
+- **Live Demo** — [leafy-malasada-f02c9a.netlify.app](https://leafy-malasada-f02c9a.netlify.app/)
+- **CodeSandbox** — [Interactive example](https://codesandbox.io/p/sandbox/tour-navigator-9hvm54?file=%2Fsrc%2Findex.tsx)
 
-## CodeSandbox Example
-For a live interactive example, you can check out this [CodeSandbox](https://codesandbox.io/p/sandbox/tour-navigator-9hvm54?file=%2Fsrc%2Findex.tsx&layout=%257B%2522sidebarPanel%2522%253A%2522EXPLORER%2522%252C%2522rootPanelGroup%2522%253A%257B%2522direction%2522%253A%2522horizontal%2522%252C%2522contentType%2522%253A%2522UNKNOWN%2522%252C%2522type%2522%253A%2522PANEL_GROUP%2522%252C%2522id%2522%253A%2522ROOT_LAYOUT%2522%252C%2522panels%2522%253A%255B%257B%2522type%2522%253A%2522PANEL_GROUP%2522%252C%2522contentType%2522%253A%2522UNKNOWN%2522%252C%2522direction%2522%253A%2522vertical%2522%252C%2522id%2522%253A%2522clvcpvjpc0006356i3zk5alfq%2522%252C%2522sizes%2522%253A%255B100%252C0%255D%252C%2522panels%2522%253A%255B%257B%2522type%2522%253A%2522PANEL_GROUP%2522%252C%2522contentType%2522%253A%2522EDITOR%2522%252C%2522direction%2522%253A%2522horizontal%2522%252C%2522id%2522%253A%2522EDITOR%2522%252C%2522panels%2522%253A%255B%257B%2522type%2522%253A%2522PANEL%2522%252C%2522contentType%2522%253A%2522EDITOR%2522%252C%2522id%2522%253A%2522clvcpvjpc0002356i1n9dlstw%2522%257D%255D%257D%252C%257B%2522type%2522%253A%2522PANEL_GROUP%2522%252C%2522contentType%2522%253A%2522SHELLS%2522%252C%2522direction%2522%253A%2522horizontal%2522%252C%2522id%2522%253A%2522SHELLS%2522%252C%2522panels%2522%253A%255B%257B%2522type%2522%253A%2522PANEL%2522%252C%2522contentType%2522%253A%2522SHELLS%2522%252C%2522id%2522%253A%2522clvcpvjpc0003356i9pagn38n%2522%257D%255D%252C%2522sizes%2522%253A%255B100%255D%257D%255D%257D%252C%257B%2522type%2522%253A%2522PANEL_GROUP%2522%252C%2522contentType%2522%253A%2522DEVTOOLS%2522%252C%2522direction%2522%253A%2522vertical%2522%252C%2522id%2522%253A%2522DEVTOOLS%2522%252C%2522panels%2522%253A%255B%257B%2522type%2522%253A%2522PANEL%2522%252C%2522contentType%2522%253A%2522DEVTOOLS%2522%252C%2522id%2522%253A%2522clvcpvjpc0005356i5ne28jfr%2522%257D%255D%252C%2522sizes%2522%253A%255B100%255D%257D%255D%252C%2522sizes%2522%253A%255B50%252C50%255D%257D%252C%2522tabbedPanels%2522%253A%257B%2522clvcpvjpc0002356i1n9dlstw%2522%253A%257B%2522tabs%2522%253A%255B%257B%2522id%2522%253A%2522clvcpvjpc0001356i6giznvew%2522%252C%2522mode%2522%253A%2522permanent%2522%252C%2522type%2522%253A%2522FILE%2522%252C%2522filepath%2522%253A%2522%252Fsrc%252Findex.tsx%2522%252C%2522state%2522%253A%2522IDLE%2522%257D%255D%252C%2522id%2522%253A%2522clvcpvjpc0002356i1n9dlstw%2522%252C%2522activeTabId%2522%253A%2522clvcpvjpc0001356i6giznvew%2522%257D%252C%2522clvcpvjpc0005356i5ne28jfr%2522%253A%257B%2522id%2522%253A%2522clvcpvjpc0005356i5ne28jfr%2522%252C%2522tabs%2522%253A%255B%255D%257D%252C%2522clvcpvjpc0003356i9pagn38n%2522%253A%257B%2522tabs%2522%253A%255B%255D%252C%2522id%2522%253A%2522clvcpvjpc0003356i9pagn38n%2522%257D%257D%252C%2522showDevtools%2522%253Atrue%252C%2522showShells%2522%253Afalse%252C%2522showSidebar%2522%253Atrue%252C%2522sidebarPanelSize%2522%253A15%257D).
-
-| Prop                   | Type                                                                 | Description                                                                                        | Default                      |
-|------------------------|----------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|------------------------------|
-| id                     | string                                                               | Unique identifier for the tour.                                                                    | ___tournavigator-${Date.now()}                         |
-| maskRadius             | number                                                               | Radius of the mask around highlighted elements.                                                    | 5                            |
-| maskPadding            | number                                                               | Padding around the mask.                                                                           | 5                            |
-| maskOpacity            | number                                                               | Opacity of the mask.                                                                               | 1                            |
-| maskStyle              | CSSProperties                                                        | Custom CSS styles for the mask.                                                                    |                              |
-| maskStyleDuringScroll  | CSSProperties                                                        | Custom CSS styles for the mask during scroll.                                                      |                             |
-| startAt                | number                                                               | Index of the step to start the tour at.                                                            | 0                            |
-| maskHelperDistance     | number                                                               | Distance between the mask and the helper element.                                                  | 10                           |
-| screenHelperDistance   | number                                                               | Distance between the screen and the helper element.                                                | 10                           |
-| onAfterOpen            | (() => void) \| null                                                 | Callback function triggered after the tour starts.                                                 | null                         |
-| onBeforeClose          | (() => void) \| null                                                 | Callback function triggered before the tour ends.                                                  | null                         |
-| steps                  | Step[]                                                               | Array of steps defining the tour.                                                                  | []                          |
-| helper                 | ((props: HelperProps) => ReactNode) \| null                          | Custom helper component for each step.                                                             | null                         |
-| isOpen                 | boolean                                                              | Flag to control the visibility of the tour.                                                        | true                         |
-| onRequestClose         | ((params: {event: MouseEvent \| PointerEvent, isMask: boolean, isOverlay: boolean}) => void) \| null | Callback function triggered when the tour is closed.                               | null                         |
-| onNext                 | ((props: HelperProps) => void) \| null                               | Callback function triggered when the "Next" button is clicked.                                     | null                         |
-| onPrev                 | ((props: HelperProps) => void) \| null                               | Callback function triggered when the "Prev" button is clicked.                                     | null                         |
-| onMove                 | ((props: HelperProps) => void) \| null                               | Callback function triggered when the tour moves to the next step.                                  | null                         |
-| scrollBehavior         | 'smooth' \| 'auto'                                                   | Defines the scroll behavior when moving to a new step.                                             | 'auto'                       |
-| resizeListener         | boolean                                                              | Flag to enable/disable resize listener.                                                            | true                         |
-| scrollListener         | boolean                                                              | Flag to enable/disable scroll listener.                                                            | true                         |
-| mutationObserve        | MutationObserverConfig                                               | Configuration for mutation observer to watch changes in DOM.                                        |                              |
-| overlayFill            | string                                                               | Fill color of the overlay.                                                                         | 'black'                      |
-| overlayOpacity         | number                                                               | Opacity of the overlay.                                                                            | 0.5                          |
-| overlay                | ((props: OverlayProps) => ReactNode) \| null                         | Custom overlay component.                                                                          | null                         |
-| className              | string                                                               | Custom CSS class for the Tour Navigator component.                                                 |                              |
-| style                  | CSSProperties                                                        | Custom CSS styles for the Tour Navigator component.                                                |                              |
-| renderOverlay          | boolean                                                              | Flag to enable/disable rendering of the overlay.                                                   | true                         |
-| renderHelper           | boolean                                                              | Flag to enable/disable rendering of the helper component.                                          | true                         |
-| renderElement          | HTMLElement \| string                                                | The element in which the Tour Navigator will be rendered.                                          |                              |
-| scrollingElement       | HTMLElement \| Document \| Element \| string                         | The element used for scrolling.                                                                    |                              |
-| waitForElementRendered | boolean                                                              | Works only when mutationObserver provided,                                                         |
-### Step
-
-```typescript
- Tour Navigator
-
-Tour Navigator is a React package designed to facilitate the creation of customizable tours for React websites.
+---
 
 ## Installation
 
-To install Tour Navigator, you can use npm or yarn:
-
 ```bash
-npm install tour-navigator 
-# or 
+npm install tour-navigator
+# or
 yarn add tour-navigator
 ```
 
-## Usage
+---
 
-```javascript
+## Quick Start
+
+```tsx
 import TourNavigator from 'tour-navigator';
-import { Align, Position } from "tour-navigator/lib/TourNavigator/types";
+import { Align, Position } from 'tour-navigator/lib/TourNavigator/types';
 
-// Define your steps
 const steps = [
   {
-    selector: '.step1',
-    data: { /* Step data */ },
-    position: Position.LEFT,
-    align: Align.START
+    selector: '.feature-button',
+    data: { title: 'New Feature', body: 'Click here to get started.' },
+    position: Position.BOTTOM,
+    align: Align.CENTER,
   },
   {
-    selector: '.step2',
-    data: { /* Step data */ },
-    position: Position.BOTTOM,
-    align: Align.CENTER
+    selector: '.settings-icon',
+    data: { title: 'Settings', body: 'Customize your experience here.' },
+    position: Position.LEFT,
+    align: Align.START,
   },
-  // Add more steps as needed
 ];
 
-// Set up Tour Navigator with your steps
 <TourNavigator
-  id="my-tour"
+  id="onboarding"
   steps={steps}
+  helper={({ currentStep, next, prev, onRequestClose }) => (
+    <div className="tooltip">
+      <h4>{currentStep?.data.title}</h4>
+      <p>{currentStep?.data.body}</p>
+      <button onClick={prev}>Back</button>
+      <button onClick={next}>Next</button>
+    </div>
+  )}
+  onRequestClose={({ isMask }) => isMask && closeTour()}
 />
 ```
-## Demo
-Check out the live demo [here](https://leafy-malasada-f02c9a.netlify.app/).
 
-## CodeSandbox Example
-For a live interactive example, you can check out this [CodeSandbox](https://codesandbox.io/p/sandbox/tour-navigator-9hvm54?file=%2Fsrc%2Findex.tsx&layout=%257B%2522sidebarPanel%2522%253A%2522EXPLORER%2522%252C%2522rootPanelGroup%2522%253A%257B%2522direction%2522%253A%2522horizontal%2522%252C%2522contentType%2522%253A%2522UNKNOWN%2522%252C%2522type%2522%253A%2522PANEL_GROUP%2522%252C%2522id%2522%253A%2522ROOT_LAYOUT%2522%252C%2522panels%2522%253A%255B%257B%2522type%2522%253A%2522PANEL_GROUP%2522%252C%2522contentType%2522%253A%2522UNKNOWN%2522%252C%2522direction%2522%253A%2522vertical%2522%252C%2522id%2522%253A%2522clvcpvjpc0006356i3zk5alfq%2522%252C%2522sizes%2522%253A%255B100%252C0%255D%252C%2522panels%2522%253A%255B%257B%2522type%2522%253A%2522PANEL_GROUP%2522%252C%2522contentType%2522%253A%2522EDITOR%2522%252C%2522direction%2522%253A%2522horizontal%2522%252C%2522id%2522%253A%2522EDITOR%2522%252C%2522panels%2522%253A%255B%257B%2522type%2522%253A%2522PANEL%2522%252C%2522contentType%2522%253A%2522EDITOR%2522%252C%2522id%2522%253A%2522clvcpvjpc0002356i1n9dlstw%2522%257D%255D%257D%252C%257B%2522type%2522%253A%2522PANEL_GROUP%2522%252C%2522contentType%2522%253A%2522SHELLS%2522%252C%2522direction%2522%253A%2522horizontal%2522%252C%2522id%2522%253A%2522SHELLS%2522%252C%2522panels%2522%253A%255B%257B%2522type%2522%253A%2522PANEL%2522%252C%2522contentType%2522%253A%2522SHELLS%2522%252C%2522id%2522%253A%2522clvcpvjpc0003356i9pagn38n%2522%257D%255D%252C%2522sizes%2522%253A%255B100%255D%257D%255D%257D%252C%257B%2522type%2522%253A%2522PANEL_GROUP%2522%252C%2522contentType%2522%253A%2522DEVTOOLS%2522%252C%2522direction%2522%253A%2522vertical%2522%252C%2522id%2522%253A%2522DEVTOOLS%2522%252C%2522panels%2522%253A%255B%257B%2522type%2522%253A%2522PANEL%2522%252C%2522contentType%2522%253A%2522DEVTOOLS%2522%252C%2522id%2522%253A%2522clvcpvjpc0005356i5ne28jfr%2522%257D%255D%252C%2522sizes%2522%253A%255B100%255D%257D%255D%252C%2522sizes%2522%253A%255B50%252C50%255D%257D%252C%2522tabbedPanels%2522%253A%257B%2522clvcpvjpc0002356i1n9dlstw%2522%253A%257B%2522tabs%2522%253A%255B%257B%2522id%2522%253A%2522clvcpvjpc0001356i6giznvew%2522%252C%2522mode%2522%253A%2522permanent%2522%252C%2522type%2522%253A%2522FILE%2522%252C%2522filepath%2522%253A%2522%252Fsrc%252Findex.tsx%2522%252C%2522state%2522%253A%2522IDLE%2522%257D%255D%252C%2522id%2522%253A%2522clvcpvjpc0002356i1n9dlstw%2522%252C%2522activeTabId%2522%253A%2522clvcpvjpc0001356i6giznvew%2522%257D%252C%2522clvcpvjpc0005356i5ne28jfr%2522%253A%257B%2522id%2522%253A%2522clvcpvjpc0005356i5ne28jfr%2522%252C%2522tabs%2522%253A%255B%255D%257D%252C%2522clvcpvjpc0003356i9pagn38n%2522%253A%257B%2522tabs%2522%253A%255B%255D%252C%2522id%2522%253A%2522clvcpvjpc0003356i9pagn38n%2522%257D%257D%252C%2522showDevtools%2522%253Atrue%252C%2522showShells%2522%253Afalse%252C%2522showSidebar%2522%253Atrue%252C%2522sidebarPanelSize%2522%253A15%257D).
+---
 
-| Prop                   | Type                                                                 | Description                                                                                        | Default                      |
-|------------------------|----------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|------------------------------|
-| id                     | string                                                               | Unique identifier for the tour.                                                                    | ___tournavigator-${Date.now()}                         |
-| maskRadius             | number                                                               | Radius of the mask around highlighted elements.                                                    | 5                            |
-| maskPadding            | number                                                               | Padding around the mask.                                                                           | 5                            |
-| maskOpacity            | number                                                               | Opacity of the mask.                                                                               | 1                            |
-| maskStyle              | CSSProperties                                                        | Custom CSS styles for the mask.                                                                    |                              |
-| maskStyleDuringScroll  | CSSProperties                                                        | Custom CSS styles for the mask during scroll.                                                      |                             |
-| startAt                | number                                                               | Index of the step to start the tour at.                                                            | 0                            |
-| maskHelperDistance     | number                                                               | Distance between the mask and the helper element.                                                  | 10                           |
-| screenHelperDistance   | number                                                               | Distance between the screen and the helper element.                                                | 10                           |
-| onAfterOpen            | (() => void) \| null                                                 | Callback function triggered after the tour starts.                                                 | null                         |
-| onBeforeClose          | (() => void) \| null                                                 | Callback function triggered before the tour ends.                                                  | null                         |
-| steps                  | Step[]                                                               | Array of steps defining the tour.                                                                  | []                          |
-| helper                 | ((props: HelperProps) => ReactNode) \| null                          | Custom helper component for each step.                                                             | null                         |
-| isOpen                 | boolean                                                              | Flag to control the visibility of the tour.                                                        | true                         |
-| onRequestClose         | ((params: {event: MouseEvent \| PointerEvent, isMask: boolean, isOverlay: boolean}) => void) \| null | Callback function triggered when the tour is closed.                               | null                         |
-| onNext                 | ((props: HelperProps) => void) \| null                               | Callback function triggered when the "Next" button is clicked.                                     | null                         |
-| onPrev                 | ((props: HelperProps) => void) \| null                               | Callback function triggered when the "Prev" button is clicked.                                     | null                         |
-| onMove                 | ((props: HelperProps) => void) \| null                               | Callback function triggered when the tour moves to the next step.                                  | null                         |
-| scrollBehavior         | 'smooth' \| 'auto'                                                   | Defines the scroll behavior when moving to a new step.                                             | 'auto'                       |
-| resizeListener         | boolean                                                              | Flag to enable/disable resize listener.                                                            | true                         |
-| scrollListener         | boolean                                                              | Flag to enable/disable scroll listener.                                                            | true                         |
-| mutationObserve        | MutationObserverConfig                                               | Configuration for mutation observer to watch changes in DOM.                                        |                              |
-| overlayFill            | string                                                               | Fill color of the overlay.                                                                         | 'black'                      |
-| overlayOpacity         | number                                                               | Opacity of the overlay.                                                                            | 0.5                          |
-| overlay                | ((props: OverlayProps) => ReactNode) \| null                         | Custom overlay component.                                                                          | null                         |
-| className              | string                                                               | Custom CSS class for the Tour Navigator component.                                                 |                              |
-| style                  | CSSProperties                                                        | Custom CSS styles for the Tour Navigator component.                                                |                              |
-| renderOverlay          | boolean                                                              | Flag to enable/disable rendering of the overlay.                                                   | true                         |
-| renderHelper           | boolean                                                              | Flag to enable/disable rendering of the helper component.                                          | true                         |
-| renderElement          | HTMLElement \| string                                                | The element in which the Tour Navigator will be rendered.                                          |                              |
-| scrollingElement       | HTMLElement \| Document \| Element \| string                         | The element used for scrolling.                                                                    |                              |
-| waitForElementRendered | boolean                                                              | Works only when mutationObserver provided,                                                         |
-### Step
+## Props
+
+### Core
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `id` | `string` | `___tournavigator-${Date.now()}` | Unique identifier for the tour instance. |
+| `steps` | `Step[]` | `[]` | Array of steps defining the tour sequence. |
+| `isOpen` | `boolean` | `true` | Controls whether the tour is visible. |
+| `startAt` | `number` | `0` | Index of the step to start the tour from. |
+| `scrollBehavior` | `'smooth' \| 'auto'` | `'auto'` | Scroll behavior when moving between steps. |
+
+### Mask
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `maskRadius` | `number` | `5` | Border radius of the highlight mask. |
+| `maskPadding` | `number` | `5` | Padding between the target element and the mask edge. |
+| `maskOpacity` | `number` | `1` | Opacity of the mask cutout. |
+| `maskStyle` | `CSSProperties` | — | Custom styles applied to the mask. |
+| `maskStyleDuringScroll` | `CSSProperties` | — | Custom styles applied to the mask while scrolling. |
+| `maskHelperDistance` | `number` | `10` | Gap between the mask edge and the helper tooltip. |
+
+### Overlay
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `overlayFill` | `string` | `'black'` | Fill color of the background overlay. |
+| `overlayOpacity` | `number` | `0.5` | Opacity of the background overlay. |
+| `overlay` | `(props: OverlayProps) => ReactNode` | `null` | Custom overlay component. Replaces the default overlay entirely. |
+| `renderOverlay` | `boolean` | `true` | Set to `false` to disable the overlay entirely. |
+| `screenHelperDistance` | `number` | `10` | Minimum distance between the helper and the screen edge. |
+
+### Helper
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `helper` | `(props: HelperProps) => ReactNode` | `null` | Render prop for the tooltip/helper shown at each step. Receives full tour state and navigation controls. |
+| `renderHelper` | `boolean` | `true` | Set to `false` to disable the helper entirely. |
+
+### Callbacks
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `onAfterOpen` | `() => void` | `null` | Fired after the tour opens. |
+| `onBeforeClose` | `() => void` | `null` | Fired before the tour closes. |
+| `onRequestClose` | `(params: { event: MouseEvent \| PointerEvent, isMask: boolean, isOverlay: boolean }) => void` | `null` | Fired when the user clicks the mask or overlay. Use this to close the tour. |
+| `onNext` | `(props: HelperProps) => void` | `null` | Fired when the tour advances to the next step. |
+| `onPrev` | `(props: HelperProps) => void` | `null` | Fired when the tour goes back a step. |
+| `onMove` | `(props: HelperProps) => void` | `null` | Fired on any step change (next or prev). |
+
+### DOM & Rendering
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `renderElement` | `HTMLElement \| string` | — | The DOM element or CSS selector to render the tour into. Defaults to `document.body`. |
+| `scrollingElement` | `HTMLElement \| Document \| Element \| string` | — | The element responsible for scrolling. Defaults to `document`. |
+| `resizeListener` | `boolean` | `true` | Recalculates mask position on window resize. |
+| `scrollListener` | `boolean` | `true` | Recalculates mask position on scroll. |
+| `mutationObserve` | `MutationObserverConfig` | — | Watch for DOM changes and update the tour accordingly. |
+| `waitForElementRendered` | `boolean` | — | When `mutationObserve` is set, waits for the target element to appear in the DOM before advancing. |
+| `className` | `string` | — | CSS class added to the root tour container. |
+| `style` | `CSSProperties` | — | Inline styles for the root tour container. |
+
+---
+
+## Step
 
 ```typescript
-type IntersectionOption = {
-  root?: Element | Document | string | null; // Default: null
-  rootMargin?: string; // Default: dynamically adjusted
-  threshold?: number; // Default: dynamically adjusted
-}
-  
 type Step = {
-  selector: string;
-  align?: Align,
+  selector: string;                    // CSS selector for the target element
+  data: any;                           // Arbitrary data passed to the helper render prop
   position?: Position | [Position, Position, Position, Position];
-  data: any,
-  scrollIntoView?: boolean;  // Default: true (Whether scroll to view element or not)
-  intersectionOption?: IntersectionOption | (intersectionOption: IntersectionOption) => IntersectionOption;
+  align?: Align;
+  scrollIntoView?: boolean;            // Default: true
+  intersectionOption?: IntersectionOption | ((opt: IntersectionOption) => IntersectionOption);
+}
+
+type IntersectionOption = {
+  root?: Element | Document | string | null;  // Default: null
+  rootMargin?: string;                        // Default: dynamically adjusted
+  threshold?: number;                         // Default: dynamically adjusted
 }
 ```
 
-### HelperProps
+### Position & Align
+
+```typescript
+import { Position, Align } from 'tour-navigator/lib/TourNavigator/types';
+
+// Position — where the helper appears relative to the target
+Position.TOP | Position.BOTTOM | Position.LEFT | Position.RIGHT
+
+// Align — alignment of the helper along that axis
+Align.START | Align.CENTER | Align.END
+```
+
+You can pass a 4-tuple to `position` as a priority order — Tour Navigator will use the first one that fits on screen:
+
+```tsx
+position={[Position.BOTTOM, Position.RIGHT, Position.TOP, Position.LEFT]}
+```
+
+---
+
+## HelperProps
+
+The `helper` render prop receives the following object:
 
 ```typescript
 type HelperProps = {
-    id?: string;
-    currentStep: Step | null;
-    target: HTMLElement | null;
-    currentStepIndex: number;
-    previousStepIndex: number;
-    steps: Step[];
-    isScrollingIntoView: boolean; // Whether scrolling element into view or not
-    focus: (scrollBehavior?: 'auto' | 'smooth') => void; // programmatically focus current targe, In case it loses
-    goto: (stepIndex: number) => void; // goto any specific steps
-    next: () => void;
-    prev: () => void;
-    onRequestClose: ((params: {event: MouseEvent | PointerEvent, isMask: boolean, isOverlay: boolean}) => void) | null
+  id: string;
+  currentStep: Step | null;
+  target: HTMLElement | null;
+  currentStepIndex: number;
+  previousStepIndex: number;
+  steps: Step[];
+  isScrollingIntoView: boolean;
+
+  focus: (scrollBehavior?: 'auto' | 'smooth') => void;   // Re-focus the current target
+  goto: (stepIndex: number) => void;                      // Jump to any step
+  next: () => void;                                       // Advance one step
+  prev: () => void;                                       // Go back one step
+  onRequestClose: ((params: {
+    event: MouseEvent | PointerEvent;
+    isMask: boolean;
+    isOverlay: boolean;
+  }) => void) | null;
 }
 ```
 
-### Passing Ref to TourNavigator
+---
 
-Since TourNavigator is a class component, you can use ref to access various built-in methods directly for enhanced customization.
+## Ref
 
-This README provides an overview of the package, its usage, props, and default props. Let me know if you need further modifications or additions!
+`TourNavigator` is a class component — you can attach a `ref` for imperative control:
 
-### License
+```tsx
+import { createRef } from 'react';
 
-This project is licensed under the [MIT](LICENSE).
+const tourRef = createRef<TourNavigator>();
+
+// Imperative API
+tourRef.current?.next();
+tourRef.current?.prev();
+tourRef.current?.goto(2);
+tourRef.current?.focus('smooth');
+
+<TourNavigator ref={tourRef} id="my-tour" steps={steps} />
+```
+
+---
+
+## Multi-Route Tours
+
+Need a tour that spans multiple pages? See [`multiroute-tour-navigator`](https://www.npmjs.com/package/multiroute-tour-navigator) — a companion package that extends Tour Navigator with React Router support and persistent step state across route changes.
+
+---
+
+## License
+
+MIT © [Vivek Sharma](https://github.com/viveKing21)
