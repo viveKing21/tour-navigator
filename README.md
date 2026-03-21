@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="./assets/tour-navigator-hero.svg" alt="tour-navigator" width="100%"/>
+</div>
+
 # Tour Navigator
 
 Tour Navigator is a React package designed to facilitate the creation of customizable tours for React websites.
